@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Go WebAssembly Example</title>
+</head>
+
+<body>
+  <h1>Go WebAssembly Example</h1>
+  <script src="wasm_exec.js"></script>
+  <script>
+    const go = new Go();
+    WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject).then((result) => {
+      go.run(result.instance);
+      console.log(add(2, 3)); // Outputs 5
+    });
+  </script>
+</body>
+
+</html>
