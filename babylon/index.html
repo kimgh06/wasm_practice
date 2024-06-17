@@ -1,0 +1,156 @@
+<html>
+
+<head>
+  <script src="https://cdn.babylonjs.com/babylon.js"></script>
+  <style>
+    #renderCanvas {
+      width: 100svw;
+      height: 100svh;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="renderCanvas"></canvas>
+  <script>
+    async function init() {
+      const canvas = document.getElementById("renderCanvas");
+      const engine = new BABYLON.WebGPUEngine(canvas);
+      await engine.initAsync();
+
+
+      const createScene = function () {
+        const scene = new BABYLON.Scene(engine);
+        scene.clearColor = new BABYLON.Color3.Black;
+
+        const alpha = Math.PI / 4;
+        const beta = Math.PI / 3;
+        const radius = 8;
+        const target = new BABYLON.Vector3(0, 0, 0);
+
+        const camera = new BABYLON.UniversalCamera("UniversalCamera", new BABYLON.Vector3(0, 5, -10), scene);
+        camera.setTarget(BABYLON.Vector3.Zero());
+
+        // Attach the camera to the canvas
+        camera.attachControl(canvas, true);
+
+        const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1, 1, 0));
+
+        for (let i = -5; i < 5; i++) {
+          for (let j = -5; j < 5; j++) {
+            const box = BABYLON.MeshBuilder.CreateBox("box", {});
+            const material = new BABYLON.StandardMaterial("material", scene);
+            material.diffuseTexture = new BABYLON.Texture("cube-diffuse.jpg", scene);
+            box.material = material;
+
+            box.position.x = i * 2;
+            box.position.z = j * 2;
+            box.position.y = 1;
+          }
+        }
+
+        // WASD control of Player "character".
+        let isWPressed = false;
+        let isAPressed = false;
+        let isSPressed = false;
+        let isDPressed = false;
+        var isSpacePressed = false;
+        var isShiftPressed = false;
+
+        // 키 입력 이벤트 리스너
+        window.addEventListener("keydown", function (event) {
+          switch (event.key) {
+            case 'w':
+              isWPressed = true;
+              break;
+            case 'a':
+              isAPressed = true;
+              break;
+            case 's':
+              isSPressed = true;
+              break;
+            case 'd':
+              isDPressed = true;
+              break;
+            case ' ':
+              isSpacePressed = true;
+              break;
+            case 'Shift':
+              isShiftPressed = true;
+              break;
+          }
+        });
+
+        window.addEventListener("keyup", function (event) {
+          switch (event.key) {
+            case 'w':
+              isWPressed = false;
+              break;
+            case 'a':
+              isAPressed = false;
+              break;
+            case 's':
+              isSPressed = false;
+              break;
+            case 'd':
+              isDPressed = false;
+              break;
+            case ' ':
+              isSpacePressed = false;
+              break;
+            case 'Shift':
+              isShiftPressed = false;
+              break;
+          }
+        });
+
+        scene.registerBeforeRender(function () {
+          if (!scene.isReady()) { return; }
+          var playerSpeed = 0.1;
+          var verticalSpeed = 0.1;
+
+          var moveX = 0;
+          var moveY = 0;
+          var moveZ = 0;
+
+          if (isWPressed) {
+            moveX += playerSpeed * Math.sin(camera.rotation.y);
+            moveZ += playerSpeed * Math.cos(camera.rotation.y);
+          }
+          if (isSPressed) {
+            moveX -= playerSpeed * Math.sin(camera.rotation.y);
+            moveZ -= playerSpeed * Math.cos(camera.rotation.y);
+          }
+          if (isAPressed) {
+            moveX -= playerSpeed * Math.sin(camera.rotation.y + Math.PI / 2);
+            moveZ -= playerSpeed * Math.cos(camera.rotation.y + Math.PI / 2);
+          }
+          if (isDPressed) {
+            moveX += playerSpeed * Math.sin(camera.rotation.y + Math.PI / 2);
+            moveZ += playerSpeed * Math.cos(camera.rotation.y + Math.PI / 2);
+          }
+          if (isSpacePressed) {
+            moveY += verticalSpeed;
+          }
+          if (isShiftPressed) {
+            moveY -= verticalSpeed;
+          }
+
+          camera.cameraDirection = new BABYLON.Vector3(moveX, moveY, moveZ);
+        });
+        return scene;
+      };
+
+      const sceneToRender = createScene();
+      engine.runRenderLoop(function () {
+        sceneToRender.render();
+      });
+    }
+    init();
+  </script>
+</body>
+
+</html>
