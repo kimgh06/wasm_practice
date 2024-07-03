@@ -56,6 +56,14 @@ pub fn pow(a: i16, b: i16) -> i64 {
 }
 
 #[wasm_bindgen]
+pub fn add(a: i16, b: i16) -> i64 {
+    let result: i64 = a as i64 + b as i64;
+    let d = result.to_string();
+    alert(&d);
+    result
+}
+
+#[wasm_bindgen]
 extern "C" {
     fn alert(s: &str);
 }

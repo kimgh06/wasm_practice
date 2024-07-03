@@ -4,45 +4,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Image Filter</title>
+  <title>WASM Example</title>
   <script type="module">
     import init from './pkg/gray.js';
 
     async function run() {
       const wasm = await init();
-      const { apply_filter } = wasm;
-      const fileInput = document.getElementById('fileInput');
-      const canvas = document.getElementById('outputCanvas');
-      const ctx = canvas.getContext('2d');
-
-      fileInput.addEventListener('change', async () => {
-        const file = fileInput.files[0];
-        const image = await createImageBitmap(file);
-
-        canvas.width = image.width;
-        canvas.height = image.height;
-        ctx.drawImage(image, 0, 0);
-
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const { width, height, data } = imageData;
-
-        const dataPtr = apply_filter(width, height, data.buffer);
-
-        const filteredData = new Uint8ClampedArray(
-          wasm.memory.buffer,
-          dataPtr,
-          width * height * 4
-        );
-
-        ctx.putImageData(new ImageData(filteredData, width, height), 0, 0);
-      });
-
-      const button = document.querySelector('button')
+      const button = document.querySelector('button');
       button.onclick = e => {
-        const { pow } = wasm;
+        const { add } = wasm;
         const one = document.getElementById('1').value;
         const two = document.getElementById('2').value;
-        console.log(pow(one, two))
+        // console.log(one, two, wasm)
+        console.log(add(+one, +two));
       }
     }
 
@@ -51,13 +25,9 @@
 </head>
 
 <body>
-  <input type="file" id="fileInput" accept="image/*">
-  <canvas id="outputCanvas"></canvas>
-
   <input id="1" type="number" />
   <input id="2" type="number" />
   <button>add</button>
-
 </body>
 
 </html>
