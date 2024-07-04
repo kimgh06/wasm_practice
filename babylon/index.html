@@ -20,6 +20,7 @@
       const canvas = document.getElementById("renderCanvas");
       const engine = new BABYLON.WebGPUEngine(canvas);
       await engine.initAsync();
+      let list = [[[]]]
 
 
       const createScene = function () {
@@ -39,16 +40,21 @@
 
         const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1, 1, 0));
 
-        for (let i = -5; i < 5; i++) {
-          for (let j = -5; j < 5; j++) {
-            const box = BABYLON.MeshBuilder.CreateBox("box", {});
-            const material = new BABYLON.StandardMaterial("material", scene);
-            material.diffuseTexture = new BABYLON.Texture("cube-diffuse.jpg", scene);
-            box.material = material;
+        for (let k = -5; k < 5; k++) {
+          list[k + 5] = []
+          for (let i = -5; i < 5; i++) {
+            list[k + 5][i + 5] = []
+            for (let j = -5; j < 5; j++) {
+              const box = BABYLON.MeshBuilder.CreateBox("box", {});
+              const material = new BABYLON.StandardMaterial("material", scene);
+              material.diffuseTexture = new BABYLON.Texture("cube-diffuse.jpg", scene);
+              box.material = material;
 
-            box.position.x = i * 2;
-            box.position.z = j * 2;
-            box.position.y = 1;
+              box.position.x = i * 2;
+              box.position.z = j * 2;
+              box.position.y = k * 2;
+              list[k + 5][i + 5][j + 5] = box;
+            }
           }
         }
 
@@ -147,6 +153,16 @@
       const sceneToRender = createScene();
       engine.runRenderLoop(function () {
         sceneToRender.render();
+        console.log(engine.getFps().toFixed() + " fps");
+        for (let k = -5; k < 5; k++) {
+          for (let i = -5; i < 5; i++) {
+            for (let j = -5; j < 5; j++) {
+              list[k + 5][i + 5][j + 5].rotation.x += 0.1;
+              list[k + 5][i + 5][j + 5].rotation.y += 0.1;
+              list[k + 5][i + 5][j + 5].rotation.z += 0.1;
+            }
+          }
+        }
       });
     }
     init();
